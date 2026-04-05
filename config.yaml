@@ -17,7 +17,7 @@ export:
   is_dynamic: true  # whether to export with dynamic axes
   input_shape: [1, 3, 256, 256]  # input shape for the model if not using dynamic axes
   onnx:
-    opset_version: 17  # ONNX opset version for export
+    opset_version: 22  # ONNX opset version for export
 
 # Dataset parameters
 dataset:

@@ -99,29 +99,77 @@ If you have used the `data_downloader.py`, it will be downloaded automatically i
 
 ## Installation
 
-1. Clone the repository:
+1. **Install `uv`** (if you haven't already (Seriously, it's such a nice tool (just use uv))):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   # Or on Windows: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+   *For more information on uv please check [Astral.uv](https://docs.astral.sh/uv/)*
+
+2. Clone the repository:
 
    ```bash
    https://github.com/yuuIind/SAR2Optical.git
    cd SAR2Optical
    ```
-2. Create a virtual environment (optional but recommended):
+
+3. **Install dependencies using `uv`:**
+   `uv` will automatically create a virtual environment (`.venv`) and install the packages. You can customize the installation based on your hardware and what you plan to do:
+
+   **For Inference only (Default):**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   uv sync
    ```
-3. Install the required dependencies:
+   *(Note: This automatically installs the CPU version of PyTorch).*
+
+   - **CUDA version:** Add cuda version if your hardware supports:
+     - `--extra cpu`: Installs the pytorch for CPU (**this is the default mode**)
+     - `--extra cu128`: Installs the pytorch with CUDA 12.8
+     - `--extra cu130`: Installs the pytorch with CUDA 13.0
+
+      *Example (Installing for cuda 12.8):*
+     ```bash
+     uv sync --extra cu128
+     ```
+
+   - **Specific Workflows:** Add groups based on what you want to do:
+     - `--group data`: Installs the Kaggle API for downloading the Sentinel dataset (`utils/data_downloader.py`).
+     - `--group train`: Installs `comet-ml`, `scipy`, and `tqdm` for training models and tracking experiments (`train.py`).
+     - `--group export`: Installs `onnx` and `onnxruntime` for exporting the model and running ONNX inference (`torch2onnx.py`).
+     
+     *Example (Installing just train and data dependencies):*
+     ```bash
+     uv sync --group train --group data
+     ```
+
+   **For full Setup (Training, Data downloading, and ONNX Export):**
    ```bash
-   pip install -r requirements.txt
+   uv sync --all-groups
    ```
+
+   **Explicit Hardware Selection (Optional):**
+   If you want to explicitly force a CPU or CUDA 12.8 installation, append the `--extra` flag:
+   ```bash
+   uv sync --all-groups --extra cpu
+   # OR
+   uv sync --all-groups --extra cu128
+   ```
+
+4. **Activate the environment:**
+   ```bash
+   source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+   ```
+   *(Alternatively, you can prefix any command with `uv run`, e.g., `uv run python train.py`, without needing to activate the environment).*
 
 ## Usage
 
 ### Prepare data
 Before training, you need to prepare the dataset. Check [Dataset](#dataset) section for more information on how to find the dataset.
+*(Requires the `data` dependency group: `uv sync --group data`)*
 
 ### Train
 To train the model, run the following command:
+*(Requires the `train` dependency group: `uv sync --group train`)*
    ```bash
    python train.py
    ```
@@ -148,6 +196,7 @@ To infer on a single image, please run the following command after changing [con
 
 ### ONNX Export
 You can export to ONNX with [torch2onnx.py](torch2onnx.py). 
+*(Requires the `export` dependency group: `uv sync --group export`)*
 
 Change the [config](./config.yaml) accordingly
    ```bash
@@ -157,7 +206,7 @@ Change the [config](./config.yaml) accordingly
       is_dynamic: true  # whether to export with dynamic axes
       input_shape: [1, 3, 256, 256]  # input shape for the model if not using dynamic axes
       onnx:
-         opset_version: 17  # ONNX opset version for export
+         opset_version: 22  # ONNX opset version for export
    ```
 Run the command
    ```bash
@@ -165,7 +214,7 @@ Run the command
    ```
 You can perform inference with the converted onnx file using the following command:
    ```bash
-   python onnx_inference.py --model sar2rgb.onnx --input input.jpg --output output.jpg
+   python onnx_inference.py --model sar2rgb.onnx --input data/examples/ROIs1868_summer_s1_59_p10.png --output output.jpg
    ```
 
 ## License

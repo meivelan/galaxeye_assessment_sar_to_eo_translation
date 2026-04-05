@@ -55,6 +55,7 @@ def main():
             input_names=[input_name],  # the model's input names
             output_names=[output_name],  # the model's output names
             dynamic_axes=dynamic_axes,  # variable length axes
+            external_data=False,
         )
 
     else:
@@ -68,6 +69,7 @@ def main():
             do_constant_folding=True,  # whether to execute constant folding for optimization
             input_names=[input_name],  # the model's input names
             output_names=[output_name],  # the model's output names
+            external_data=False,
         )
 
 
