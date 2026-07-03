@@ -52,7 +52,7 @@ for sp in splits:
         if args.use_AB:
             name_B = name_A.replace('_A.', '_B.')
         else:
-            name_B = name_A
+            name_B = name_A.replace("_s1_", "_s2_")
         path_B = img_fold_B / name_B
         if path_A.is_file() and path_B.is_file():
             name_AB = name_A
