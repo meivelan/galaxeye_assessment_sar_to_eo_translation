@@ -29,6 +29,5 @@ def calculate_fid(real_features, generated_features):
     # Numerically stable version of sqrtm
     if np.iscomplexobj(covmean):
         covmean = covmean.real
-
     fid = diff.dot(diff) + np.trace(sigma_real + sigma_gen - 2 * covmean)
     return fid
