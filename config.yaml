@@ -29,12 +29,12 @@ model:
 
 # Training parameters
 training:
-  num_epochs: 200
+  num_epochs: 20
   batch_size: 32
   lr: 0.0002
   beta1: 0.5
   beta2: 0.999
-  use_validation: false
+  use_validation: true
   save_freq: 5
   eval_freq: 5
   resume: false
